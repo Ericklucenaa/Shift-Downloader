@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x=".5" y=".5" width="23" height="23" rx="5" fill="#17171a"/><path d="M7 6.5v11M12 6.5v11M17 6.5v5.5M7 12h10" stroke="#f3f2ee" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="17" cy="17" r="2.1" fill="#e0531b"/></svg>
+    <strong>SHIFT</strong>
+    <span id="status" class="status" role="status">Verificando…</span>
+  </header>
+  <p id="help" class="help" hidden></p>
+  <button id="sendPage" type="button">Baixar vídeo/áudio desta página</button>
+  <section>
+    <label class="row"><input type="checkbox" id="openMagnets"> Abrir links magnet no SHIFT</label>
+  </section>
+  <section>
+    <label class="row"><input type="checkbox" id="intercept"> Capturar downloads do navegador</label>
+    <div id="opts">
+      <label>Tipos de arquivo <input id="extensions" spellcheck="false"></label>
+      <label>A partir de <input id="minSizeMB" type="number" min="0" step="1"> MB</label>
+      <p class="note">Se o SHIFT não responder, o navegador baixa normalmente.</p>
+    </div>
+  </section>
+  <script src="popup.js"></script>
+</body>
+</html>

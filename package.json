@@ -1,0 +1,11 @@
+{
+  "name": "shift",
+  "private": true,
+  "workspaces": ["apps/desktop"],
+  "scripts": {
+    "dev": "npm run tauri -w apps/desktop -- dev",
+    "build": "npm run tauri -w apps/desktop -- build",
+    "test": "npm test -w apps/desktop && cargo test --workspace",
+    "lint": "npm run lint -w apps/desktop && cargo clippy --workspace --all-targets -- -D warnings"
+  }
+}

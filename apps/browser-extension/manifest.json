@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "SHIFT Download Manager",
+  "short_name": "SHIFT",
+  "version": "0.3.0",
+  "description": "Envia links e downloads para o SHIFT Download Manager.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApJmfIt9NDI5nvF8GE/zHXxWLOJ9ZVTNxRB95YAmkrCite1tkYBZhyUUUG7wzExd1kyWZzqjE8TlG9/h39pDMMCpAdUGzrsbE3+Ft918uKOTKDonCIH64OApfHWPzKbez7SyhGZEBx6CKEmmJgUWL13k59kShPerlnc2VAoaE+g40rAPP/S25GNVGUipT9wYEDX0ylzxiX2SYIzYfv5611qsKVYVRl5ENRSJy3Ulb2VY6cimT80ujjVWzzLTVckhnFutcq1rEs+RjpJV2/mOZ3tsCuFBU4wVWljo4hGNMmZsTZjG/tW4jgfeQHgCOIXf9e4qqPCM2OyB0yPujGDTQdQIDAQAB",
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "downloads",
+    "nativeMessaging",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "SHIFT",
+    "default_icon": {
+      "32": "icon-32.png",
+      "64": "icon-64.png"
+    }
+  },
+  "icons": {
+    "32": "icon-32.png",
+    "64": "icon-64.png",
+    "128": "icon-128.png"
+  },
+  "minimum_chrome_version": "116",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "magnet.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+SHIFT Download Manager
+======================
+
+O SHIFT inclui componentes de terceiros, distribuídos sob as próprias licenças.
+
+aria2 1.37.0 (build oficial win-64bit-build1)
+  https://github.com/aria2/aria2
+  Licença: GNU General Public License v2 ou posterior, com exceção para OpenSSL.
+  O texto completo está em docs/third-party/aria2/COPYING e LICENSE.OpenSSL.
+  O código-fonte desta versão está em
+  https://github.com/aria2/aria2/releases/tag/release-1.37.0
+  O SHIFT executa o aria2 como um programa separado (processo filho) e conversa
+  com ele por JSON-RPC; o aria2 não é ligado ao código do SHIFT.
+
+Bibliotecas Rust e JavaScript usadas na compilação mantêm suas licenças
+(MIT, Apache-2.0 e similares), listadas nos manifestos Cargo.toml e package.json.
+
+FFmpeg 9.0.2 (build BtbN "win64-gpl-shared", autobuild 2026-11-13)
+  https://github.com/BtbN/FFmpeg-Builds
+  Licença: GPL v3 (build com libx264 e outros componentes GPL). O texto está em
+  tools/ffmpeg/LICENSE.txt dentro da instalação. Código-fonte: https://ffmpeg.org/download.html
+  e https://github.com/BtbN/FFmpeg-Builds (receitas de compilação).
+  Executado como programa separado (ffmpeg.exe / ffprobe.exe).
+
+yt-dlp 2026.10.26
+  https://github.com/yt-dlp/yt-dlp
+  Licença: Unlicense (domínio público). Executado como programa separado.
+  O SHIFT não contorna DRM, paywall nem login de terceiros.

@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Dependências do frontend
+        run: npm ci
+
+      - name: Ferramentas de mídia (yt-dlp e FFmpeg, SHA-256 conferido)
+        run: node scripts/fetch-tools.mjs
+
+      - name: Tipos e testes do frontend
+        run: |
+          npm run lint -w apps/desktop
+          npm test -w apps/desktop
+
+      - name: Build do frontend (o crate Tauri embute o dist)
+        run: npm run build -w apps/desktop
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      # Inclui os testes de aceitação com o aria2 real (binário versionado em src-tauri/binaries).
+      - name: Testes Rust
+        run: cargo test --workspace
+
+      - name: Instalador (NSIS)
+        run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shift-windows
+          path: target/release/bundle/nsis/*.exe

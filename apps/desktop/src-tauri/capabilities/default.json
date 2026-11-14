@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Menor privilégio: eventos do núcleo, diálogo de escolher pasta e mais nada. Abrir arquivos passa por comandos próprios que validam o caminho no banco.",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "dialog:allow-open",
+    "notification:default"
+  ]
+}

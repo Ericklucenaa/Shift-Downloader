@@ -1,0 +1,416 @@
+/*
+  SHIFT · material "líquido"
+  Cápsula de acrílico com espessura: aresta superior viva, reflexo especular,
+  borda luminosa (gradiente na borda), sombra interna embaixo (espessura) e
+  sombras externas em camadas (elevação). Selecionado/aceso: a luz surge de
+  dentro (::after) e espalha pelo corpo, com brilho colorido nas bordas.
+  Só transform/opacity/box-shadow animam (GPU), sem layout shift.
+*/
+
+:root {
+  --lq-top: rgb(255 255 255 / 0.95);
+  --lq-bottom: rgb(234 232 226 / 0.86);
+  --lq-rim-hi: rgb(255 255 255 / 1);
+  --lq-rim-lo: rgb(23 23 26 / 0.14);
+  --lq-shadow: 40 30 20;
+  --lq-spec: rgb(255 255 255 / 0.85);
+  /* seleção (tema claro): laranja da marca; miolo escuro o bastante para texto branco ≥ 4,5:1 */
+  --lq-accent: #b4410f;
+  --lq-accent-hi: #ff8a50;
+  --lq-accent-deep: #8a2e08;
+  --lq-glow: rgb(224 83 27 / 0.5);
+  --lq-track: rgb(23 23 26 / 0.06);
+}
+:root[data-theme="dark"] {
+  --lq-top: rgb(255 255 255 / 0.15);
+  --lq-bottom: rgb(255 255 255 / 0.035);
+  --lq-rim-hi: rgb(255 255 255 / 0.42);
+  --lq-rim-lo: rgb(255 255 255 / 0.06);
+  --lq-shadow: 0 0 0;
+  --lq-spec: rgb(255 255 255 / 0.45);
+  /* seleção (tema escuro): vermelho incandescente */
+  --lq-accent: #b8261a;
+  --lq-accent-hi: #ff7a52;
+  --lq-accent-deep: #6e1209;
+  --lq-glow: rgb(255 70 40 / 0.6);
+  --lq-track: rgb(0 0 0 / 0.35);
+}
+
+/* ---------- cápsula base ---------- */
+.lq,
+:root[data-buttons="liquid"] .btn-primary,
+:root[data-buttons="liquid"] .btn-secondary,
+:root[data-buttons="liquid"] .seg-item[aria-checked="true"] {
+  position: relative;
+  isolation: isolate;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(180deg, var(--lq-top), var(--lq-bottom)) padding-box,
+    linear-gradient(180deg, var(--lq-rim-hi), var(--lq-rim-lo) 55%, var(--lq-rim-hi)) border-box;
+  box-shadow:
+    inset 0 2px 1px -1px rgb(255 255 255 / 0.7),
+    inset 0 -9px 14px -9px rgb(var(--lq-shadow) / 0.38),
+    0 1px 1px rgb(var(--lq-shadow) / 0.12),
+    0 8px 18px -9px rgb(var(--lq-shadow) / 0.45),
+    0 18px 32px -20px rgb(var(--lq-shadow) / 0.5);
+  transition:
+    transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 300ms ease,
+    color 220ms ease;
+  will-change: transform;
+}
+.lq {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  padding: 0 18px;
+  color: var(--ink);
+  font: 500 13px/1 var(--font-sans);
+  cursor: default;
+  user-select: none;
+}
+.lq[data-size="sm"] {
+  height: 32px;
+  padding: 0 14px;
+  gap: 8px;
+}
+
+/* reflexo especular (vidro convexo) */
+.lq::before,
+:root[data-buttons="liquid"] .btn-primary::before,
+:root[data-buttons="liquid"] .btn-secondary::before,
+:root[data-buttons="liquid"] .seg-item[aria-checked="true"]::before {
+  content: "";
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  top: 2px;
+  height: 46%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--lq-spec), rgb(255 255 255 / 0));
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 220ms ease;
+}
+
+/* luz interna: surge pelo corpo ao selecionar */
+.lq::after,
+:root[data-buttons="liquid"] .btn-primary::after,
+:root[data-buttons="liquid"] .seg-item[aria-checked="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  background:
+    radial-gradient(110% 130% at 50% 125%, var(--lq-accent-hi), transparent 58%),
+    linear-gradient(180deg, color-mix(in srgb, var(--lq-accent) 55%, var(--lq-accent-hi)) 0%, var(--lq-accent) 42%, var(--lq-accent-deep) 100%);
+  opacity: 0;
+  transform: scaleX(0.55);
+  transition:
+    opacity 340ms ease,
+    transform 460ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lq > *,
+:root[data-buttons="liquid"] .btn > .btn-label,
+:root[data-buttons="liquid"] .seg-item > span {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------- aceso / selecionado ---------- */
+.lq[data-lit="true"],
+.lq[aria-checked="true"],
+.lq[aria-pressed="true"],
+:root[data-buttons="liquid"] .btn-primary,
+:root[data-buttons="liquid"] .seg-item[aria-checked="true"] {
+  color: #fff;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.35);
+  box-shadow:
+    inset 0 2px 1px -1px rgb(255 255 255 / 0.6),
+    inset 0 -9px 14px -8px rgb(0 0 0 / 0.4),
+    0 0 0 1px color-mix(in srgb, var(--lq-accent-hi) 55%, transparent),
+    0 0 18px var(--lq-glow),
+    0 10px 26px -10px var(--lq-glow),
+    0 2px 4px rgb(0 0 0 / 0.25);
+}
+.lq[data-lit="true"]::after,
+.lq[aria-checked="true"]::after,
+.lq[aria-pressed="true"]::after,
+:root[data-buttons="liquid"] .btn-primary::after,
+:root[data-buttons="liquid"] .seg-item[aria-checked="true"]::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+.lq[data-lit="true"]::before,
+.lq[aria-checked="true"]::before,
+.lq[aria-pressed="true"]::before,
+:root[data-buttons="liquid"] .btn-primary::before {
+  opacity: 0.55;
+}
+
+/* ---------- interação ---------- */
+.lq:hover,
+:root[data-buttons="liquid"] .btn-primary:hover,
+:root[data-buttons="liquid"] .btn-secondary:hover {
+  transform: translateY(-1px);
+  filter: none;
+}
+.lq:hover::before,
+:root[data-buttons="liquid"] .btn-secondary:hover::before {
+  opacity: 1;
+}
+/* pressionar: afunda como peça física */
+.lq:active,
+:root[data-buttons="liquid"] .btn-primary:active,
+:root[data-buttons="liquid"] .btn-secondary:active {
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 90ms;
+  box-shadow:
+    inset 0 3px 8px rgb(var(--lq-shadow) / 0.35),
+    inset 0 -4px 8px -6px rgb(var(--lq-shadow) / 0.3),
+    0 1px 2px rgb(var(--lq-shadow) / 0.2);
+}
+.lq:focus-visible,
+:root[data-buttons="liquid"] .btn:focus-visible,
+:root[data-buttons="liquid"] .seg-item:focus-visible {
+  outline: 2px solid var(--lq-accent-hi);
+  outline-offset: 3px;
+}
+:root[data-buttons="liquid"] .btn:disabled {
+  opacity: 0.5;
+  box-shadow: inset 0 2px 1px -1px rgb(255 255 255 / 0.3);
+}
+:root[data-buttons="liquid"] .btn-primary:disabled::after {
+  filter: saturate(0.4);
+}
+:root[data-buttons="liquid"] .btn {
+  padding-inline: 16px;
+}
+:root[data-buttons="liquid"] .btn-ghost,
+:root[data-buttons="liquid"] .btn-danger {
+  border-radius: 999px;
+}
+
+/* ---------- pontos decorativos e ícone ---------- */
+.lq-dots {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: auto;
+  opacity: 0.55;
+}
+.lq-dots i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.lq-icon {
+  display: inline-flex;
+  width: 18px;
+  justify-content: center;
+}
+.lq-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- grupo de opções (só uma acesa) ---------- */
+:root[data-buttons="liquid"] .seg {
+  border-radius: 999px;
+  border-color: transparent;
+  background: var(--lq-track);
+  padding: 3px;
+  box-shadow:
+    inset 0 2px 5px rgb(var(--lq-shadow) / 0.22),
+    inset 0 -1px 0 rgb(255 255 255 / 0.25);
+}
+:root[data-buttons="liquid"] .seg-item {
+  border-radius: 999px;
+  padding-inline: 14px;
+  transition: color 220ms ease;
+}
+:root[data-buttons="liquid"] .seg-item[aria-checked="true"] {
+  background: transparent;
+}
+
+/* ---------- chave liga/desliga ---------- */
+:root[data-buttons="liquid"] .lq-switch {
+  border: 0;
+  background: var(--lq-track);
+  box-shadow: inset 0 2px 4px rgb(var(--lq-shadow) / 0.3);
+}
+:root[data-buttons="liquid"] .lq-switch[aria-checked="true"] {
+  background: linear-gradient(180deg, var(--lq-accent-hi), var(--lq-accent));
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 0.25),
+    0 0 12px var(--lq-glow);
+}
+:root[data-buttons="liquid"] .lq-switch > span {
+  background: radial-gradient(circle at 35% 30%, #fff, #e6e3dc 70%);
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 0.35),
+    inset 0 -1px 2px rgb(0 0 0 / 0.15);
+}
+
+/* ---------- barra lateral e botões leves: vidro; o item ativo fica aceso ---------- */
+:root[data-buttons="liquid"] .nav-item,
+:root[data-buttons="liquid"] .btn-ghost {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--lq-top) 55%, transparent), color-mix(in srgb, var(--lq-bottom) 40%, transparent)) padding-box,
+    linear-gradient(180deg, color-mix(in srgb, var(--lq-rim-hi) 60%, transparent), var(--lq-rim-lo) 55%, color-mix(in srgb, var(--lq-rim-hi) 45%, transparent)) border-box;
+  box-shadow:
+    inset 0 1px 1px -0.5px rgb(255 255 255 / 0.45),
+    inset 0 -6px 10px -8px rgb(var(--lq-shadow) / 0.25),
+    0 4px 10px -8px rgb(var(--lq-shadow) / 0.35);
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 260ms ease,
+    background 220ms ease,
+    color 220ms ease;
+}
+:root[data-buttons="liquid"] .nav-item {
+  margin-block: 2px;
+}
+:root[data-buttons="liquid"] .nav-item:hover,
+:root[data-buttons="liquid"] .btn-ghost:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, var(--lq-top), var(--lq-bottom)) padding-box,
+    linear-gradient(180deg, var(--lq-rim-hi), var(--lq-rim-lo) 55%, var(--lq-rim-hi)) border-box;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 2px 1px -1px rgb(255 255 255 / 0.65),
+    inset 0 -8px 12px -8px rgb(var(--lq-shadow) / 0.32),
+    0 8px 16px -10px rgb(var(--lq-shadow) / 0.45);
+}
+:root[data-buttons="liquid"] .nav-item:active,
+:root[data-buttons="liquid"] .btn-ghost:active {
+  transform: translateY(1px) scale(0.985);
+  transition-duration: 90ms;
+}
+:root[data-buttons="liquid"] .btn-ghost:disabled {
+  background: transparent;
+  box-shadow: none;
+}
+/* ativo: mesma luz interna dos seletores */
+:root[data-buttons="liquid"] .nav-item[aria-current="page"] {
+  position: relative;
+  isolation: isolate;
+  color: #fff;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.35);
+  background:
+    linear-gradient(180deg, var(--lq-top), var(--lq-bottom)) padding-box,
+    linear-gradient(180deg, var(--lq-rim-hi), var(--lq-rim-lo) 55%, var(--lq-rim-hi)) border-box;
+  box-shadow:
+    inset 0 2px 1px -1px rgb(255 255 255 / 0.6),
+    inset 0 -9px 14px -8px rgb(0 0 0 / 0.4),
+    0 0 0 1px color-mix(in srgb, var(--lq-accent-hi) 55%, transparent),
+    0 0 16px var(--lq-glow),
+    0 8px 20px -10px var(--lq-glow);
+}
+:root[data-buttons="liquid"] .nav-item[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  background:
+    radial-gradient(110% 130% at 50% 125%, var(--lq-accent-hi), transparent 58%),
+    linear-gradient(180deg, color-mix(in srgb, var(--lq-accent) 55%, var(--lq-accent-hi)) 0%, var(--lq-accent) 42%, var(--lq-accent-deep) 100%);
+  animation: lq-light-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+:root[data-buttons="liquid"] .nav-item[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 2px;
+  height: 45%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.45), rgb(255 255 255 / 0));
+  pointer-events: none;
+}
+:root[data-buttons="liquid"] .nav-item[aria-current="page"] .nav-icon,
+:root[data-buttons="liquid"] .nav-item[aria-current="page"] .num {
+  color: rgb(255 255 255 / 0.9);
+}
+:root[data-buttons="liquid"] .nav-item .nav-bar {
+  display: none;
+}
+@keyframes lq-light-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- demonstração 3D (Configurações → Aparência) ---------- */
+.lq-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  padding: 48px 24px 56px;
+  perspective: 1100px;
+  background:
+    radial-gradient(70% 90% at 50% 0%, rgb(255 255 255 / 0.6), transparent 70%),
+    linear-gradient(180deg, #e9e7e1, #d7d4cc);
+}
+:root[data-theme="dark"] .lq-stage {
+  background:
+    radial-gradient(70% 90% at 50% 0%, rgb(255 255 255 / 0.07), transparent 70%),
+    linear-gradient(180deg, #1d1d21, #0d0d0f);
+}
+.lq-stage-surface {
+  display: grid;
+  justify-content: center;
+  gap: 18px;
+  transform: rotateX(38deg) rotateZ(-24deg);
+  transform-style: preserve-3d;
+}
+.lq-stage-surface > .lq {
+  width: 230px;
+  height: 52px;
+}
+.lq-stage-surface > .lq:nth-child(2) {
+  transform: translateX(26px);
+}
+.lq-stage-surface > .lq:nth-child(3) {
+  transform: translateX(52px);
+}
+.lq-stage-surface > .lq:nth-child(2):hover {
+  transform: translateX(26px) translateY(-1px);
+}
+.lq-stage-surface > .lq:nth-child(3):hover {
+  transform: translateX(52px) translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lq,
+  .lq::after,
+  :root[data-buttons="liquid"] .btn,
+  :root[data-buttons="liquid"] .btn::after,
+  :root[data-buttons="liquid"] .seg-item::after,
+  :root[data-buttons="liquid"] .nav-item,
+  :root[data-buttons="liquid"] .btn-ghost {
+    transition: none !important;
+  }
+  :root[data-buttons="liquid"] .nav-item[aria-current="page"]::after {
+    animation: none;
+  }
+  .lq:hover,
+  .lq:active,
+  :root[data-buttons="liquid"] .btn:hover,
+  :root[data-buttons="liquid"] .btn:active {
+    transform: none;
+  }
+}

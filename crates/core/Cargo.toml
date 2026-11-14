@@ -1,0 +1,32 @@
+[package]
+name = "shift-core"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+base64 = "0.23.1"
+chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
+fs4 = "1.1.0"
+percent-encoding = "2.3.2"
+reqwest = { version = "0.13.5", default-features = false, features = ["native-tls", "http2", "charset"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+sha1 = "0.11.0"
+sha2 = "0.11.1"
+shift-download-engine = { path = "../download-engine" }
+shift-media = { path = "../media" }
+shift-persistence = { path = "../persistence" }
+shift-security = { path = "../security" }
+thiserror = "2.0.21"
+tokio = { version = "1.54.1", features = ["rt", "sync", "time", "macros", "net", "fs"] }
+tracing = "0.1.44"
+trash = "5.3.0"
+url = "2.5.8"
+uuid = { version = "1.29.2", features = ["v4"] }
+
+[dev-dependencies]
+sha2 = "0.11.1"
+shift-media = { path = "../media" }
+tempfile = "3.27.0"
+tokio = { version = "1.54.1", features = ["full"] }

@@ -11,6 +11,7 @@ import { Button, Spinner, TipProvider } from './components/ui/primitives';
 import { actions, reportError } from './lib/actions';
 import { translate, useT } from './lib/i18n';
 import { api, subscribe } from './lib/ipc';
+import { useAutoUpdateCheck } from './lib/update';
 import { useApp } from './lib/store';
 import { applyButtons, applyTheme } from './lib/theme';
 import { TorrentFilesHost } from './components/TorrentFiles';
@@ -168,6 +169,7 @@ export function App() {
   const bar = useRef<LinkBarHandle>(null);
   useCoreConnection(bar);
   useGlobalPaste(bar);
+  useAutoUpdateCheck();
   const ready = useApp((s) => s.ready);
   const loadError = useApp((s) => s.loadError);
   const view = useApp((s) => s.view);

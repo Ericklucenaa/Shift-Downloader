@@ -335,3 +335,10 @@ export interface ExternalAdd {
   fileName?: string | null;
   referrer?: string | null;
 }
+
+export interface UpdateInfo {
+  version: string;
+  current: string;
+  notes: string | null;
+  date: string | null;
+}

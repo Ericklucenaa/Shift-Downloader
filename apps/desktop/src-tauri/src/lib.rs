@@ -9,6 +9,7 @@ pub mod native_host;
 mod power;
 mod sink;
 mod tray;
+mod updater;
 
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
@@ -24,6 +25,8 @@ pub struct AppState {
     pub browser_error: Option<String>,
     /// Magnet/.torrent com que o Windows abriu o SHIFT (a interface busca quando estiver pronta).
     pub launch: Mutex<Option<bridge::ExternalAdd>>,
+    /// Última versão nova encontrada, à espera de o usuário mandar instalar.
+    pub update: Mutex<Option<tauri_plugin_updater::Update>>,
 }
 
 /// O aria2 vai empacotado como sidecar: no app instalado (e no `tauri dev`) fica ao
@@ -66,6 +69,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let data = app.path().app_data_dir()?;
             std::fs::create_dir_all(&data)?;
@@ -121,7 +125,7 @@ pub fn run() {
                     tracing::warn!(error = %e, "ponte com o navegador indisponível");
                 }
             });
-            app.manage(AppState { manager, sink, browsers, browser_error, launch });
+            app.manage(AppState { manager, sink, browsers, browser_error, launch, update: Mutex::new(None) });
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -189,6 +193,8 @@ pub fn run() {
             commands::torrent_files,
             commands::set_torrent_files,
             commands::scan_file,
+            updater::app_update_check,
+            updater::app_update_install,
         ])
         .build(tauri::generate_context!())
         .expect("falha ao iniciar o SHIFT");

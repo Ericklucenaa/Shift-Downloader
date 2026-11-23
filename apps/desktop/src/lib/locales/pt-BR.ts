@@ -398,7 +398,23 @@ export const ptBR = {
   "liquid.dnd": "Não perturbe",
   "liquid.personal": "Pessoal",
   "settings.extraTrackers": "Rastreadores públicos extras",
-  "settings.extraTrackersHelp": "Soma rastreadores abertos conhecidos a cada magnet e torrent. Magnets sem rastreador passam a achar participantes em segundos (só com a rede DHT podiam levar minutos)."
+  "settings.extraTrackersHelp": "Soma rastreadores abertos conhecidos a cada magnet e torrent. Magnets sem rastreador passam a achar participantes em segundos (só com a rede DHT podiam levar minutos).",
+  "update.section": "Atualizações",
+  "update.version": "Versão instalada",
+  "update.versionHelp": "O app procura versões novas ao abrir e a cada 6 horas. Cada atualização é conferida por assinatura antes de ser instalada.",
+  "update.check": "Procurar atualizações",
+  "update.checking": "Procurando…",
+  "update.none": "Você está na versão mais recente.",
+  "update.available": "Versão {version} disponível",
+  "update.install": "Instalar e reiniciar",
+  "update.installHelp": "Downloads em andamento são pausados e continuam quando o app reabrir.",
+  "update.downloading": "Baixando atualização… {pct}",
+  "update.installing": "Instalando… o app vai reabrir sozinho.",
+  "update.error": "Não foi possível atualizar: {detail}",
+  "update.nav": "Atualizar para {version}",
+  "update.toast": "Nova versão do Shift Downloader: {version}",
+  "update.toastBody": "Vá em Configurações › Atualizações para instalar.",
+  "update.notes": "Novidades"
 } as const;
 
 export type MessageKey = keyof typeof ptBR;

@@ -6,7 +6,7 @@
 
 Gerenciador de downloads para Windows (antes chamado SHIFT): links HTTP/HTTPS, torrents, vídeo e áudio de sites compatíveis, conversão de mídia, agendamento e integração com Chrome/Edge. Núcleo em Rust (Tauri 2), motor aria2, interface em React.
 
-**Versão 0.5.0.** O que está pronto, o que foi testado e o que ficou de fora está em [docs/TASKS.md](docs/TASKS.md) e [docs/TEST_PLAN.md](docs/TEST_PLAN.md).
+**Versão 0.5.1.** O que está pronto, o que foi testado e o que ficou de fora está em [docs/TASKS.md](docs/TASKS.md) e [docs/TEST_PLAN.md](docs/TEST_PLAN.md).
 
 ## O que ele faz
 
@@ -24,7 +24,9 @@ Gerenciador de downloads para Windows (antes chamado SHIFT): links HTTP/HTTPS, t
 
 ## Instalar para testar
 
-Rode `Shift Downloader_0.5.0_x64-setup.exe` (gerado em `target/release/bundle/nsis/`). Instala só para o usuário atual, sem pedir administrador. O instalador ainda **não é assinado**, então o Windows SmartScreen pode avisar ("Mais informações" → "Executar assim mesmo").
+Rode `Shift Downloader_0.5.1_x64-setup.exe` (gerado em `target/release/bundle/nsis/`). Instala só para o usuário atual, sem pedir administrador. O instalador ainda **não é assinado**, então o Windows SmartScreen pode avisar ("Mais informações" → "Executar assim mesmo").
+
+**Atualizações:** a partir da 0.5.1 o app procura versões novas sozinho (ao abrir e a cada 6 horas), avisa na barra lateral e instala com um clique em Configurações → Atualizações. Cada instalador é conferido por assinatura antes de rodar. Quem está na 0.5.0 ou anterior precisa instalar a 0.5.1 manualmente uma vez.
 
 **Extensão do navegador:** depois de abrir o Shift Downloader uma vez, vá em Configurações → Navegador, clique em "Abrir pasta da extensão" e siga as instruções da tela (chrome://extensions ou edge://extensions → Modo do desenvolvedor → Carregar sem compactação).
 

@@ -399,5 +399,21 @@ export const es: Messages = {
   "liquid.dnd": "No molestar",
   "liquid.personal": "Personal",
   "settings.extraTrackers": "Rastreadores públicos adicionales",
-  "settings.extraTrackersHelp": "Añade rastreadores abiertos conocidos a cada magnet y torrent. Los magnets sin rastreador encuentran participantes en segundos (solo con DHT podían tardar minutos)."
+  "settings.extraTrackersHelp": "Añade rastreadores abiertos conocidos a cada magnet y torrent. Los magnets sin rastreador encuentran participantes en segundos (solo con DHT podían tardar minutos).",
+  "update.section": "Actualizaciones",
+  "update.version": "Versión instalada",
+  "update.versionHelp": "La app busca versiones nuevas al abrir y cada 6 horas. Cada actualización se verifica por firma antes de instalarse.",
+  "update.check": "Buscar actualizaciones",
+  "update.checking": "Buscando…",
+  "update.none": "Tienes la versión más reciente.",
+  "update.available": "Versión {version} disponible",
+  "update.install": "Instalar y reiniciar",
+  "update.installHelp": "Las descargas en curso se pausan y continúan cuando la app vuelva a abrir.",
+  "update.downloading": "Descargando actualización… {pct}",
+  "update.installing": "Instalando… la app se volverá a abrir sola.",
+  "update.error": "No se pudo actualizar: {detail}",
+  "update.nav": "Actualizar a {version}",
+  "update.toast": "Nueva versión de Shift Downloader: {version}",
+  "update.toastBody": "Ve a Configuración › Actualizaciones para instalarla.",
+  "update.notes": "Novedades"
 };

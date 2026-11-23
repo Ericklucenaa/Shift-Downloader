@@ -1,12 +1,13 @@
 import clsx from 'clsx';
-import { ArrowDownToLine, CalendarClock, CircleAlert, CircleCheck, Film, Gauge, Heart, Layers, Library, Magnet, Settings } from 'lucide-react';
+import { ArrowDownToLine, CalendarClock, CircleAlert, CircleArrowUp, CircleCheck, Film, Gauge, Heart, Layers, Library, Magnet, Settings } from 'lucide-react';
 import { api } from '../lib/ipc';
+import { useUpdate } from '../lib/update';
 import type { ReactNode } from 'react';
 import { useT } from '../lib/i18n';
 import { counts, useApp, type Filter, type View } from '../lib/store';
 import { Wordmark } from './brand';
 
-function NavItem({ icon, label, count, active, onClick, tone, title }: { icon: ReactNode; label: string; count?: number; active: boolean; onClick: () => void; tone?: 'bad' | 'accent'; title?: string }) {
+function NavItem({ icon, label, count, active, onClick, tone, title, highlight }: { icon: ReactNode; label: string; count?: number; active: boolean; onClick: () => void; tone?: 'bad' | 'accent'; title?: string; highlight?: boolean }) {
   return (
     <button
       type="button"
@@ -15,11 +16,11 @@ function NavItem({ icon, label, count, active, onClick, tone, title }: { icon: R
       aria-current={active ? 'page' : undefined}
       className={clsx(
         'nav-item group relative flex h-9 w-full items-center gap-3 rounded-md px-3 text-left text-[13.5px] transition-colors duration-100',
-        active ? 'bg-sunken font-medium text-ink' : 'text-ink-2 hover:bg-sunken/70 hover:text-ink'
+        active ? 'bg-sunken font-medium text-ink' : highlight ? 'font-medium text-accent hover:bg-sunken/70' : 'text-ink-2 hover:bg-sunken/70 hover:text-ink'
       )}
     >
       {active && <span className="nav-bar absolute top-2 bottom-2 left-0 w-[3px] rounded-full bg-accent" aria-hidden="true" />}
-      <span className={clsx('nav-icon flex w-4 justify-center [&>svg]:size-4', active ? 'text-accent' : 'text-muted group-hover:text-ink-2')}>{icon}</span>
+      <span className={clsx('nav-icon flex w-4 justify-center [&>svg]:size-4', active || highlight ? 'text-accent' : 'text-muted group-hover:text-ink-2')}>{icon}</span>
       <span className="flex-1 truncate">{label}</span>
       {count != null && count > 0 && <span className={clsx('num text-[11.5px]', tone === 'bad' ? 'text-bad' : tone === 'accent' ? 'text-accent' : 'text-muted')}>{count}</span>}
     </button>
@@ -39,6 +40,7 @@ export function Sidebar() {
   const media = useApp((s) => s.media);
   const scheduleOn = useApp((s) => s.settings?.schedule.enabled ?? false);
   const navigate = useApp((s) => s.navigate);
+  const update = useUpdate((s) => (s.phase !== 'none' ? s.info : null));
   const c = counts(tasks);
   const mediaActive = Object.values(media).filter((m) => m.status === 'running' || m.status === 'queued').length;
   const isDl = (f: Filter) => view === 'downloads' && filter === f;
@@ -65,6 +67,18 @@ export function Sidebar() {
       </nav>
 
       <div className="mt-auto flex flex-col gap-0.5 pt-4">
+        {update && (
+          <NavItem
+            icon={<CircleArrowUp />}
+            label={t('update.nav', { version: update.version })}
+            active={false}
+            highlight
+            onClick={() => {
+              navigate('settings');
+              requestAnimationFrame(() => document.getElementById('updates')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+            }}
+          />
+        )}
         <NavItem icon={<Heart />} label={t('nav.donate')} title={t('nav.donateTip')} active={false} onClick={() => void api.openDonate()} />
         <NavItem icon={<Settings />} label={t('nav.settings')} active={view === 'settings'} onClick={go('settings')} />
       </div>

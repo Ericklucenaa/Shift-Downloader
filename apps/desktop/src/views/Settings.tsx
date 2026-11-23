@@ -1,5 +1,5 @@
 import { open as openDialog } from '@tauri-apps/plugin-dialog';
-import { Check, FolderOpen, RefreshCw } from 'lucide-react';
+import { Check, Download, FolderOpen, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { reportError } from '../lib/actions';
 import { PageTitle } from '../components/ui/page';
@@ -7,6 +7,7 @@ import { useT } from '../lib/i18n';
 import { api } from '../lib/ipc';
 import { useApp } from '../lib/store';
 import { applyButtons, applyTheme } from '../lib/theme';
+import { checkForUpdate, installUpdate, useUpdate } from '../lib/update';
 import type { BrowserStatus, DefaultsStatus, HostStat, Language, Settings as S, SpeedMode, Theme, ToolsInfo } from '../lib/types';
 import { Button } from '../components/ui/primitives';
 import { Field, Section, Segmented, Stepper, Toggle } from '../components/ui/form';
@@ -331,9 +332,67 @@ export function Settings() {
           </Field>
         </Section>
 
+        <UpdatesSection />
+
         <h2 className="mt-8 text-[11px] font-medium tracking-[0.08em] text-muted uppercase">{t('settings.about')}</h2>
         <p className="mt-2 max-w-prose text-[12.5px] text-muted">{t('settings.aboutBody')}</p>
       </div>
+    </div>
+  );
+}
+
+function UpdatesSection() {
+  const { t } = useT();
+  const { phase, current, info, downloaded, total, error } = useUpdate();
+  const busy = phase === 'checking' || phase === 'downloading' || phase === 'installing';
+  const pct = total ? Math.min(100, Math.round((downloaded / total) * 100)) : null;
+
+  const status =
+    phase === 'checking' ? t('update.checking')
+    : phase === 'none' ? t('update.none')
+    : phase === 'downloading' ? t('update.downloading', { pct: pct != null ? `${pct}%` : '' })
+    : phase === 'installing' ? t('update.installing')
+    : phase === 'error' ? t('update.error', { detail: error ?? '' })
+    : info ? t('update.available', { version: info.version })
+    : null;
+
+  return (
+    <div id="updates" className="scroll-mt-16">
+      <Section title={t('update.section')}>
+        <Field label={t('update.version')} help={t('update.versionHelp')}>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12.5px]">
+            <span className="num">{current ?? '—'}</span>
+            {status && (
+              <span role="status" className={phase === 'error' ? 'text-bad' : info && phase !== 'none' ? 'font-medium text-accent' : 'text-muted'}>
+                {status}
+              </span>
+            )}
+            <span className="ml-auto flex gap-2">
+              {info && phase !== 'none' ? (
+                <Button variant="primary" size="sm" icon={<Download size={13} />} disabled={busy} onClick={() => void installUpdate()}>
+                  {t('update.install')}
+                </Button>
+              ) : (
+                <Button size="sm" icon={<RefreshCw size={13} className={phase === 'checking' ? 'spin' : ''} />} disabled={busy} onClick={() => void checkForUpdate(true)}>
+                  {t('update.check')}
+                </Button>
+              )}
+            </span>
+          </div>
+          {(phase === 'downloading' || phase === 'installing') && (
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-sunken" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct ?? undefined}>
+              <div className="h-full bg-accent transition-[width] duration-200" style={{ width: `${phase === 'installing' ? 100 : pct ?? 8}%` }} />
+            </div>
+          )}
+          {info && phase === 'available' && <p className="mt-2 text-[12px] text-muted">{t('update.installHelp')}</p>}
+          {info?.notes && phase !== 'none' && (
+            <details className="mt-2 text-[12.5px]">
+              <summary className="cursor-pointer text-ink-2">{t('update.notes')}</summary>
+              <p className="mt-1.5 whitespace-pre-line text-muted selectable">{info.notes}</p>
+            </details>
+          )}
+        </Field>
+      </Section>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type {
   AddRequest, BatchResult, BrowserStatus, DefaultsStatus, TorrentMeta, ConvertOptions, Diagnostic, EngineState, EventView, ExternalAdd, FileProbe,
   Insights, MediaDownloadRequest, MediaInfo, MediaView, OpenResult, ProbeView, Settings, Snapshot, Stats, TaskView,
-  ToolsInfo, TorrentInfo, TorrentRequest
+  ToolsInfo, TorrentInfo, TorrentRequest, UpdateInfo
 } from './types';
 
 export const api = {
@@ -36,6 +36,8 @@ export const api = {
   openFile: (id: string, confirmed = false) => invoke<OpenResult>('open_file', { id, confirmed }),
   revealFile: (id: string) => invoke<void>('reveal_file', { id }),
   openDonate: () => invoke<void>('open_donate'),
+  appUpdateCheck: () => invoke<UpdateInfo | null>('app_update_check'),
+  appUpdateInstall: () => invoke<void>('app_update_install'),
   sourceUrl: (id: string) => invoke<string>('source_url', { id }),
 
   mediaList: () => invoke<MediaView[]>('media_list'),

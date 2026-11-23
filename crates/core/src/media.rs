@@ -450,11 +450,33 @@ impl MediaManager {
     /// Arquivo (ou pasta, para playlists) do resultado.
     pub fn output_path(&self, id: &str) -> CoreResult<PathBuf> {
         let j = self.inner.require(id)?;
-        let p = j.output_path.map(PathBuf::from).ok_or_else(|| state_err("Ainda não há arquivo de saída."))?;
-        if !p.exists() {
+        if let Some(p) = j.output_path.as_deref().map(PathBuf::from).filter(|p| p.exists()) {
+            return Ok(p);
+        }
+        // Trabalhos concluídos antes da correção da leitura podem não ter o caminho gravado:
+        // procura o arquivo na pasta de destino pelo título e guarda para as próximas vezes.
+        if j.status == "completed"
+            && let Some(found) = find_output_by_title(Path::new(&j.output_dir), &j.title)
+        {
+            let _ = self.inner.db.set_media_output(id, &found.to_string_lossy());
+            return Ok(found);
+        }
+        if j.output_path.is_some() {
             return Err(state_err("O arquivo não está mais na pasta."));
         }
-        Ok(p)
+        Err(state_err("Ainda não há arquivo de saída."))
+    }
+
+    /// Para "Abrir pasta": o arquivo, se existir; senão a pasta de destino (melhor que um erro).
+    pub fn reveal_target(&self, id: &str) -> CoreResult<(PathBuf, bool)> {
+        match self.output_path(id) {
+            Ok(p) => Ok((p, true)),
+            Err(e) => {
+                let j = self.inner.require(id)?;
+                let dir = PathBuf::from(&j.output_dir);
+                if dir.is_dir() { Ok((dir, false)) } else { Err(e) }
+            }
+        }
     }
 
     pub(crate) async fn shutdown(&self) {
@@ -705,9 +727,18 @@ async fn spawn_and_follow(inner: &Arc<MInner>, id: &str, program: &Path, args: &
         lines
     });
     if let Some(out) = child.stdout.take() {
-        let mut rd = BufReader::new(out).lines();
-        while let Ok(Some(l)) = rd.next_line().await {
-            on_line(&l);
+        // Lê bytes e converte com tolerância: `lines()` parava na primeira linha que não fosse UTF-8 válido
+        // e a linha final com o caminho do arquivo (SHIFTFILE) nunca chegava. Era por isso que vídeos com
+        // "·" ou emoji no título terminavam sem arquivo de saída e "Abrir"/"Abrir pasta" falhavam.
+        // O yt-dlp agora recebe --encoding utf-8; a leitura tolerante fica como garantia.
+        let mut rd = BufReader::new(out);
+        let mut buf = Vec::with_capacity(512);
+        loop {
+            buf.clear();
+            match rd.read_until(b'\n', &mut buf).await {
+                Ok(0) | Err(_) => break,
+                Ok(_) => on_line(&decode_line(&buf)),
+            }
         }
     }
     let status = child.wait().await.map_err(|e| tool_err("media_failed", &e.to_string()))?;
@@ -849,4 +880,72 @@ async fn run_convert(inner: &Arc<MInner>, job: &MediaJob) -> Result<Option<Strin
     }
     let _ = inner.db.set_media_progress(&job.id, 1.0, size.map(|s| s as i64));
     Ok(Some(output))
+}
+
+
+/// Converte uma linha da saída de uma ferramenta: UTF-8 tolerante, sem quebra de linha no fim.
+fn decode_line(bytes: &[u8]) -> String {
+    String::from_utf8_lossy(bytes).trim_end_matches(['\n', '\r']).to_string()
+}
+
+/// Só letras e números ASCII, em minúsculas. O yt-dlp troca caracteres proibidos no Windows ("|", ":"…) e,
+/// antes da correção de codificação, títulos gravados no banco vinham com "�" no lugar de "·", "é" etc.
+/// Ignorar tudo que não é ASCII faz "Cruzou � Gol" (banco) bater com "Cruzou é Gol" (arquivo).
+fn simplify(s: &str) -> String {
+    s.chars().filter(char::is_ascii_alphanumeric).map(|c| c.to_ascii_lowercase()).collect()
+}
+
+/// Arquivo da pasta cujo nome começa como o título (o modelo de nome é "%(title).150B [%(id)s].%(ext)s").
+/// Ignora partes temporárias do yt-dlp e, havendo mais de um, fica com o mais recente.
+fn find_output_by_title(dir: &Path, title: &str) -> Option<PathBuf> {
+    let key: String = simplify(title).chars().take(40).collect();
+    if key.chars().count() < 4 {
+        return None;
+    }
+    let mut best: Option<(std::time::SystemTime, PathBuf)> = None;
+    for entry in std::fs::read_dir(dir).ok()?.flatten() {
+        let path = entry.path();
+        let Some(name) = path.file_name().map(|n| n.to_string_lossy().to_lowercase()) else { continue };
+        if !path.is_file() || name.ends_with(".part") || name.ends_with(".ytdl") || name.contains(".part-frag") || name.ends_with(".temp") {
+            continue;
+        }
+        if !simplify(&name).starts_with(&key) {
+            continue;
+        }
+        let modified = entry.metadata().and_then(|m| m.modified()).unwrap_or(std::time::UNIX_EPOCH);
+        if best.as_ref().is_none_or(|(t, _)| modified > *t) {
+            best = Some((modified, path));
+        }
+    }
+    best.map(|(_, p)| p)
+}
+
+#[cfg(test)]
+mod output_tests {
+    use super::*;
+
+    #[test]
+    fn invalid_utf8_line_is_decoded_instead_of_stopping() {
+        // "·" em cp1252 é 0xB7: inválido em UTF-8. Antes, a leitura parava aqui.
+        let line = decode_line(b"SHIFTFILE C:\\D\\2.1K views \xb7 770 [abc].mp4\r\n");
+        assert!(line.starts_with("SHIFTFILE C:"));
+        assert!(line.ends_with("[abc].mp4"));
+    }
+
+    #[test]
+    fn finds_finished_file_by_title_ignoring_forbidden_characters() {
+        let dir = std::env::temp_dir().join(format!("shift-find-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let wanted = dir.join("2.1K views · 770 reactions ｜ The Office ｜ Cruzou é Gol [1681432380].mp4");
+        std::fs::write(&wanted, b"x").unwrap();
+        std::fs::write(dir.join("2.1K views · 770 reactions ｜ The Office ｜ Cruzou é Gol [1681432380].mp4.part"), b"x").unwrap();
+        std::fs::write(dir.join("Outro video [zzz].mp4"), b"x").unwrap();
+        let found = find_output_by_title(&dir, "2.1K views · 770 reactions | The Office | Cruzou é Gol");
+        assert_eq!(found.as_deref(), Some(wanted.as_path()));
+        // Título como ficou no banco antes da correção (caracteres trocados por U+FFFD).
+        let mangled = "2.1K views \u{FFFD} 770 reactions | The Office | Cruzou \u{FFFD} Gol";
+        assert_eq!(find_output_by_title(&dir, mangled).as_deref(), Some(wanted.as_path()));
+        assert!(find_output_by_title(&dir, "Nada a ver com isso").is_none());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }

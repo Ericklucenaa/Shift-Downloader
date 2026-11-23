@@ -213,6 +213,10 @@ pub fn download_args(a: &DownloadArgs<'_>) -> Vec<String> {
         push(x);
     }
     for x in [
+        // Sem isso, no Windows o yt-dlp escreve no código de página do console (cp1252): "·", acentos e
+        // emoji no título chegavam como bytes inválidos e a linha com o caminho final se perdia.
+        "--encoding",
+        "utf-8",
         "--newline",
         "--no-colors",
         "--windows-filenames",
@@ -235,7 +239,7 @@ pub fn download_args(a: &DownloadArgs<'_>) -> Vec<String> {
 
 /// Argumentos da análise (JSON único; playlists sem baixar cada item).
 pub fn analyze_args(url: &str) -> Vec<String> {
-    ["-J", "--flat-playlist", "--no-warnings", "--no-colors", "--", url].into_iter().map(str::to_string).collect()
+    ["--encoding", "utf-8", "-J", "--flat-playlist", "--no-warnings", "--no-colors", "--", url].into_iter().map(str::to_string).collect()
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -364,6 +368,11 @@ mod tests {
         assert!(a.contains(&"bv*[height<=720]+ba/b[height<=720]".to_string()));
         assert!(a.contains(&"--embed-subs".to_string()));
         let mp3 = download_args(&DownloadArgs { url: "u", choice: "audio-mp3", out_dir: "d", ffmpeg_dir: "f", playlist: true, subtitles: true });
+        // Saída sempre em UTF-8: sem isso, títulos com "·" ou acentos quebravam a leitura do caminho final.
+        for args in [&mp3, &analyze_args("u")] {
+            let i = args.iter().position(|x| x == "--encoding").expect("--encoding");
+            assert_eq!(args[i + 1], "utf-8");
+        }
         assert!(mp3.contains(&"mp3".to_string()) && !mp3.contains(&"--embed-subs".to_string()));
         assert!(mp3.contains(&"--yes-playlist".to_string()));
     }

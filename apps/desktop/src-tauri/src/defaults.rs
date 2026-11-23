@@ -57,7 +57,7 @@ mod imp {
     /// ProgIDs e capacidades: não invasivo, roda a cada abertura.
     pub fn register_capabilities(exe: &Path) -> std::io::Result<()> {
         let icon = format!("\"{}\",0", exe.display());
-        for (progid, desc) in [("SHIFT.magnet", "Link magnet (SHIFT)"), ("SHIFT.torrent", "Arquivo torrent (SHIFT)")] {
+        for (progid, desc) in [("SHIFT.magnet", "Link magnet (Shift Downloader)"), ("SHIFT.torrent", "Arquivo torrent (Shift Downloader)")] {
             let base = format!(r"Software\Classes\{progid}");
             set(&base, "", desc)?;
             set(&format!(r"{base}\DefaultIcon"), "", &icon)?;
@@ -65,7 +65,7 @@ mod imp {
         }
         set(r"Software\Classes\SHIFT.magnet", "URL Protocol", "")?;
         set(r"Software\Classes\.torrent\OpenWithProgids", "SHIFT.torrent", "")?;
-        set(CAPABILITIES, "ApplicationName", "SHIFT")?;
+        set(CAPABILITIES, "ApplicationName", "Shift Downloader")?;
         set(CAPABILITIES, "ApplicationDescription", "Gerenciador de downloads: links, torrents, vídeo e áudio.")?;
         set(&format!(r"{CAPABILITIES}\URLAssociations"), "magnet", "SHIFT.magnet")?;
         set(&format!(r"{CAPABILITIES}\FileAssociations"), ".torrent", "SHIFT.torrent")?;
@@ -124,6 +124,30 @@ mod imp {
         }
     }
 
+    /// Caminhos gravados por uma instalação antiga (até a 0.4.1 a pasta era %LOCALAPPDATA%\SHIFT):
+    /// a inicialização com o Windows e o link magnet passam a apontar para o executável atual.
+    /// Só reescreve o que já era nosso (o mesmo nome de executável); escolhas de outros programas ficam.
+    pub fn refresh_paths(exe: &Path) -> std::io::Result<()> {
+        let file = exe.file_name().map(|n| n.to_string_lossy().to_lowercase()).unwrap_or_default();
+        let ours = |cmd: &str| {
+            let c = cmd.to_lowercase();
+            !file.is_empty() && c.contains(&file) && !c.contains(&exe.display().to_string().to_lowercase())
+        };
+        if let Some(run) = get(RUN_KEY, "SHIFT")
+            && ours(&run)
+        {
+            set(RUN_KEY, "SHIFT", &format!("\"{}\" --minimized", exe.display()))?;
+        }
+        if let Some(cmd) = get(r"Software\Classes\magnet\shell\open\command", "")
+            && ours(&cmd)
+        {
+            set(r"Software\Classes\magnet\shell\open\command", "", &command(exe))?;
+            set(r"Software\Classes\magnet\DefaultIcon", "", &format!("\"{}\",0", exe.display()))?;
+            notify_shell();
+        }
+        Ok(())
+    }
+
     pub fn clear_installer_flag() {
         if let Ok(k) = hkcu().open_subkey_with_flags(APP_KEY, winreg::enums::KEY_SET_VALUE) {
             let _ = k.delete_value("MakeDefault");
@@ -138,6 +162,9 @@ mod imp {
     pub fn register_capabilities(_: &Path) -> std::io::Result<()> {
         Ok(())
     }
+    pub fn refresh_paths(_: &Path) -> std::io::Result<()> {
+        Ok(())
+    }
     pub fn claim(_: &Path) -> std::io::Result<()> {
         Err(std::io::Error::other("só no Windows"))
     }
@@ -150,7 +177,7 @@ mod imp {
     pub fn clear_installer_flag() {}
 }
 
-pub use imp::{claim, clear_installer_flag, register_capabilities, set_autostart, status};
+pub use imp::{claim, clear_installer_flag, refresh_paths, register_capabilities, set_autostart, status};
 
 /// Argumentos que o Windows passa ao abrir um magnet ou um .torrent com o SHIFT.
 pub fn launch_target(args: &[String]) -> Option<crate::bridge::ExternalAdd> {

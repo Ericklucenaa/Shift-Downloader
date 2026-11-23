@@ -1,7 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "SHIFT",
-  "version": "0.4.1",
+  "productName": "Shift Downloader",
+  "mainBinaryName": "shift-desktop",
+  "version": "0.5.0",
   "identifier": "app.shift.downloads",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -12,7 +13,7 @@
   "app": {
     "windows": [
       {
-        "title": "SHIFT",
+        "title": "Shift Downloader",
         "width": 1280,
         "height": 800,
         "minWidth": 960,

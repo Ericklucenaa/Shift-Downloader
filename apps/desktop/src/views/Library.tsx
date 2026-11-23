@@ -3,6 +3,7 @@ import { FolderSearch, Info, Search, SquareArrowOutUpRight, Wand2 } from 'lucide
 import { useMemo, useState } from 'react';
 import { actions, mediaActions } from '../lib/actions';
 import { bytes, dateTime, fileKind } from '../lib/format';
+import { PageTitle } from '../components/ui/page';
 import { useT } from '../lib/i18n';
 import { libraryItems, useApp, type LibraryItem } from '../lib/store';
 import type { Category } from '../lib/types';
@@ -54,10 +55,9 @@ export function Library() {
 
   return (
     <section className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <div className="flex flex-wrap items-center gap-3 px-4 pt-4 pb-3">
-        <h1 className="text-[15px] font-semibold tracking-[-0.01em]">{t('nav.library')}</h1>
-        <span className="num text-[12px] text-muted">{t('library.count', { n: visible.length, size: bytes(total, lang) })}</span>
-        <label className="ml-auto flex h-7 w-64 items-center gap-1.5 rounded-md border border-line bg-surface px-2 focus-within:border-line-strong">
+      <div className="px-6 pt-5 pb-3">
+        <PageTitle eyebrow={t('nav.groupTools')} title={t('nav.library')} caption={<span className="num">{t('library.count', { n: visible.length, size: bytes(total, lang) })}</span>}>
+        <label className="flex h-8 w-64 items-center gap-1.5 rounded-md border border-line bg-surface px-2 focus-within:border-line-strong">
           <Search size={13} className="text-faint" />
           <input
             value={q}
@@ -67,8 +67,9 @@ export function Library() {
             className="h-full min-w-0 flex-1 bg-transparent text-[12.5px] outline-none placeholder:text-faint"
           />
         </label>
+        </PageTitle>
       </div>
-      <div className="flex flex-wrap gap-1.5 px-4 pb-3">
+      <div className="flex flex-wrap gap-1.5 px-6 pb-3">
         <Chip id="all" label={t('library.all')} n={items.length} />
         {CATS.filter((c) => countOf(c) > 0).map((c) => (
           <Chip key={c} id={c} label={t(`library.cat.${c}` as 'library.cat.video')} n={countOf(c)} />

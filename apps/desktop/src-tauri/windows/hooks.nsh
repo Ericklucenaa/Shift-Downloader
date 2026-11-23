@@ -1,4 +1,22 @@
-; Ganchos do instalador do SHIFT (Tauri NSIS).
+; Ganchos do instalador do Shift Downloader (Tauri NSIS).
+
+!macro NSIS_HOOK_PREINSTALL
+  ; Até a 0.4.1 o app se chamava "SHIFT" e ficava em %LOCALAPPDATA%\SHIFT. Remove só a instalação antiga
+  ; (programa, atalhos e a entrada em "Programas instalados"); dados e configurações ficam em
+  ; %APPDATA%\app.shift.downloads e continuam valendo. Não roda o desinstalador antigo: ele apagaria a
+  ; inicialização com o Windows e as associações de magnet/.torrent que a pessoa escolheu.
+  IfFileExists "$LOCALAPPDATA\SHIFT\shift-desktop.exe" 0 shift_no_old_install
+    nsExec::Exec 'taskkill /IM shift-desktop.exe /F'
+    nsExec::Exec 'taskkill /IM aria2c.exe /F'
+    Sleep 1000
+    RMDir /r "$LOCALAPPDATA\SHIFT"
+    DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\SHIFT"
+    Delete "$SMPROGRAMS\SHIFT.lnk"
+    Delete "$SMPROGRAMS\SHIFT\SHIFT.lnk"
+    RMDir "$SMPROGRAMS\SHIFT"
+    Delete "$DESKTOP\SHIFT.lnk"
+  shift_no_old_install:
+!macroend
 
 !macro NSIS_HOOK_POSTINSTALL
   ; Na instalação silenciosa (/S) não pergunta nada.
@@ -9,7 +27,7 @@
 !macroend
 
 !macro NSIS_HOOK_POSTUNINSTALL
-  ; Remove só o que é do SHIFT; associações de outros programas ficam intactas.
+  ; Remove só o que é do Shift Downloader; associações de outros programas ficam intactas.
   DeleteRegKey HKCU "Software\Classes\SHIFT.magnet"
   DeleteRegKey HKCU "Software\Classes\SHIFT.torrent"
   DeleteRegValue HKCU "Software\Classes\.torrent\OpenWithProgids" "SHIFT.torrent"

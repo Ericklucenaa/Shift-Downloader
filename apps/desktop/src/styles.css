@@ -7,59 +7,61 @@
 @import "@fontsource/ibm-plex-mono/500.css";
 
 /*
-  SHIFT — linguagem visual
-  Instrumento de precisão: papel neutro, linhas finas, um único acento
-  laranja-sinal (a "luz de troca de marcha") e números sempre em mono.
+  Shift Downloader — linguagem visual
+  Mesma família do Shift Control: cinzas neutros, cartões com borda fina, cantos de 8 px,
+  um único acento turquesa e números sempre tabulares.
 */
 
 :root {
-  --bg: #f3f2ee;
+  --bg: #f3f4f5;
+  --sidebar: #eceef0;
   --surface: #ffffff;
-  --surface-2: #f8f7f4;
-  --sunken: #ecebe6;
-  --line: #e2e0d9;
-  --line-strong: #cfccc3;
-  --ink: #17171a;
-  --ink-2: #4a4945;
-  --muted: #5c5a55;
-  --faint: #6b6963;
-  --accent: #e0531b;
+  --surface-2: #f7f8f9;
+  --sunken: #eef0f2;
+  --line: #dfe2e5;
+  --line-strong: #c9cdd2;
+  --ink: #15171a;
+  --ink-2: #3a3f45;
+  --muted: #555b62;
+  --faint: #6a7077;
+  --accent: #187a6f;
   --accent-ink: #ffffff;
-  --accent-soft: #fbe6dc;
-  --ok: #2e7d4f;
-  --ok-soft: #e1f0e6;
-  --warn: #a96a00;
+  --accent-soft: #dcefec;
+  --ok: #2e8b62;
+  --ok-soft: #e0f1e8;
+  --warn: #9a6512;
   --warn-soft: #f6ecd6;
-  --bad: #c2352b;
+  --bad: #c93c35;
   --bad-soft: #f8e1de;
-  --track: #e6e4dd;
-  --focus: #e0531b;
-  --shadow-pop: 0 12px 32px -12px rgb(23 23 26 / 0.28), 0 0 0 1px var(--line);
+  --track: #e4e7ea;
+  --focus: #187a6f;
+  --shadow-pop: 0 12px 32px -12px rgb(21 23 26 / 0.25), 0 0 0 1px var(--line);
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --bg: #101012;
-  --surface: #17171a;
-  --surface-2: #1c1c20;
-  --sunken: #0c0c0e;
-  --line: #29292e;
-  --line-strong: #3a3a40;
-  --ink: #edece8;
-  --ink-2: #c4c2bc;
-  --muted: #a09e98;
-  --faint: #868480;
-  --accent: #ff6a2c;
-  --accent-ink: #160b05;
-  --accent-soft: #3a1d10;
-  --ok: #5cc28a;
-  --ok-soft: #15291d;
-  --warn: #e3aa45;
+  --bg: #101112;
+  --sidebar: #0c0d0e;
+  --surface: #17181a;
+  --surface-2: #1e2023;
+  --sunken: #25272a;
+  --line: #232528;
+  --line-strong: #34373b;
+  --ink: #ecedee;
+  --ink-2: #c3c6ca;
+  --muted: #a0a4aa;
+  --faint: #81868d;
+  --accent: #2bb3a3;
+  --accent-ink: #04201c;
+  --accent-soft: #10302c;
+  --ok: #4fb286;
+  --ok-soft: #13291f;
+  --warn: #e3a83b;
   --warn-soft: #2d2311;
-  --bad: #ff7466;
+  --bad: #e5534b;
   --bad-soft: #341714;
-  --track: #26262b;
-  --focus: #ff6a2c;
+  --track: #26282b;
+  --focus: #2bb3a3;
   --shadow-pop: 0 16px 40px -12px rgb(0 0 0 / 0.7), 0 0 0 1px var(--line-strong);
   color-scheme: dark;
 }
@@ -85,11 +87,13 @@
   --color-bad: var(--bad);
   --color-bad-soft: var(--bad-soft);
   --color-track: var(--track);
-  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --radius-sm: 3px;
+  --color-sidebar: var(--sidebar);
+  --font-sans: "Segoe UI Variable Text", "Segoe UI", "IBM Plex Sans", system-ui, sans-serif;
+  --font-display: "Segoe UI Variable Display", "Segoe UI", "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "Cascadia Mono", "IBM Plex Mono", ui-monospace, monospace;
+  --radius-sm: 4px;
   --radius-md: 5px;
-  --radius-lg: 7px;
+  --radius-lg: 8px;
   --shadow-pop: var(--shadow-pop);
 }
 
@@ -162,4 +166,25 @@ textarea,
 }
 .spin {
   animation: shift-spin 0.8s linear infinite;
+}
+
+/* Cabeçalho de página no padrão do Shift Control: rótulo em caixa alta, título grande, legenda. */
+.page-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.page-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.page-caption {
+  font-size: 12.5px;
+  color: var(--muted);
 }

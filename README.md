@@ -1,8 +1,10 @@
-# SHIFT Download Manager
+# Shift Downloader
 
-Gerenciador de downloads para Windows: links HTTP/HTTPS, torrents, vídeo e áudio de sites compatíveis, conversão de mídia, agendamento e integração com Chrome/Edge. Núcleo em Rust (Tauri 2), motor aria2, interface em React.
+[![Apoie no Ko-fi](https://img.shields.io/badge/Ko--fi-apoiar%20o%20projeto-2BB3A3?logo=ko-fi&logoColor=white)](https://ko-fi.com/ericklucena)
 
-**Versão 0.2.0.** O que está pronto, o que foi testado e o que ficou de fora está em [docs/TASKS.md](docs/TASKS.md) e [docs/TEST_PLAN.md](docs/TEST_PLAN.md).
+Gerenciador de downloads para Windows (antes chamado SHIFT): links HTTP/HTTPS, torrents, vídeo e áudio de sites compatíveis, conversão de mídia, agendamento e integração com Chrome/Edge. Núcleo em Rust (Tauri 2), motor aria2, interface em React.
+
+**Versão 0.5.0.** O que está pronto, o que foi testado e o que ficou de fora está em [docs/TASKS.md](docs/TASKS.md) e [docs/TEST_PLAN.md](docs/TEST_PLAN.md).
 
 ## O que ele faz
 
@@ -20,9 +22,9 @@ Gerenciador de downloads para Windows: links HTTP/HTTPS, torrents, vídeo e áud
 
 ## Instalar para testar
 
-Rode `SHIFT_0.2.0_x64-setup.exe` (gerado em `target/release/bundle/nsis/`). Instala só para o usuário atual, sem pedir administrador. O instalador ainda **não é assinado**, então o Windows SmartScreen pode avisar ("Mais informações" → "Executar assim mesmo").
+Rode `Shift Downloader_0.5.0_x64-setup.exe` (gerado em `target/release/bundle/nsis/`). Instala só para o usuário atual, sem pedir administrador. O instalador ainda **não é assinado**, então o Windows SmartScreen pode avisar ("Mais informações" → "Executar assim mesmo").
 
-**Extensão do navegador:** depois de abrir o SHIFT uma vez, vá em Configurações → Navegador, clique em "Abrir pasta da extensão" e siga as instruções da tela (chrome://extensions ou edge://extensions → Modo do desenvolvedor → Carregar sem compactação).
+**Extensão do navegador:** depois de abrir o Shift Downloader uma vez, vá em Configurações → Navegador, clique em "Abrir pasta da extensão" e siga as instruções da tela (chrome://extensions ou edge://extensions → Modo do desenvolvedor → Carregar sem compactação).
 
 ## Desenvolver
 
@@ -56,3 +58,7 @@ Documentos: [Arquitetura](docs/ARCHITECTURE.md) · [Decisões](docs/DECISIONS.md
 ## Licenças de terceiros
 
 aria2 (GPL-2.0+), FFmpeg (build GPL) e yt-dlp (Unlicense) rodam como programas separados. Detalhes em [docs/third-party/NOTICE.txt](docs/third-party/NOTICE.txt).
+
+## Apoie o projeto
+
+O Shift Downloader é gratuito e de código aberto. Se ele te ajuda, considere apoiar no **[Ko-fi](https://ko-fi.com/ericklucena)**: o botão também fica na barra lateral do app, em "Apoiar o projeto".

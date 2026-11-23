@@ -159,6 +159,14 @@ pub fn reveal_file(app: tauri::AppHandle, state: State<'_, AppState>, id: String
     app.opener().reveal_item_in_dir(state.manager.file_path(&id)?).map_err(io)
 }
 
+/// Página de doação (Ko-fi). Endereço fixo: a interface não escolhe a URL.
+pub const DONATE_URL: &str = "https://ko-fi.com/ericklucena";
+
+#[tauri::command]
+pub fn open_donate(app: tauri::AppHandle) -> R<()> {
+    app.opener().open_url(DONATE_URL, None::<&str>).map_err(io)
+}
+
 #[tauri::command]
 pub fn source_url(state: State<'_, AppState>, id: String) -> R<String> {
     state.manager.source_url(&id)
@@ -218,7 +226,13 @@ pub fn media_open(app: tauri::AppHandle, state: State<'_, AppState>, id: String,
 
 #[tauri::command]
 pub fn media_reveal(app: tauri::AppHandle, state: State<'_, AppState>, id: String) -> R<()> {
-    app.opener().reveal_item_in_dir(state.manager.media().output_path(&id)?).map_err(io)
+    // Com o arquivo: abre a pasta já com ele selecionado. Sem ele: abre a pasta de destino.
+    let (path, is_file) = state.manager.media().reveal_target(&id)?;
+    if is_file {
+        app.opener().reveal_item_in_dir(path).map_err(io)
+    } else {
+        app.opener().open_path(path.to_string_lossy(), None::<&str>).map_err(io)
+    }
 }
 
 #[tauri::command]

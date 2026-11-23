@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { PageTitle } from './ui/page';
 import { Search } from 'lucide-react';
 import { memo, useEffect, useRef } from 'react';
 import { actions } from '../lib/actions';
@@ -149,10 +150,9 @@ export function DownloadList() {
 
   return (
     <section className="@container flex min-h-0 min-w-0 flex-1 flex-col">
-      <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-        <h1 className="text-[15px] font-semibold tracking-[-0.01em]">{t(titleKey[filter])}</h1>
-        <span className="num text-[12px] text-muted">{list.length}</span>
-        <label className="ml-auto flex h-7 w-56 items-center gap-1.5 rounded-md border border-line bg-surface px-2 focus-within:border-line-strong">
+      <div className="px-4 pt-4 pb-3">
+        <PageTitle eyebrow={t('nav.groupDownloads')} title={<>{t(titleKey[filter])} <span className="num align-middle text-[14px] font-normal text-muted">{list.length}</span></>}>
+        <label className="flex h-8 w-56 items-center gap-1.5 rounded-md border border-line bg-surface px-2 focus-within:border-line-strong">
           <Search size={13} className="text-faint" />
           <input
             value={query}
@@ -162,6 +162,7 @@ export function DownloadList() {
             className="h-full min-w-0 flex-1 bg-transparent text-[12.5px] outline-none placeholder:text-faint"
           />
         </label>
+        </PageTitle>
       </div>
       <div className={clsx(GRID, 'hidden gap-x-4 border-y border-line bg-surface-2 px-4 py-1.5 text-[11px] font-medium tracking-[0.06em] text-muted uppercase @2xl:grid')}>
         <span className="pl-11">{t('col.name')}</span>

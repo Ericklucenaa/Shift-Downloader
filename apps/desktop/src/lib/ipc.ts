@@ -35,6 +35,7 @@ export const api = {
   updateSettings: (settings: Settings) => invoke<Settings>('update_settings', { settings }),
   openFile: (id: string, confirmed = false) => invoke<OpenResult>('open_file', { id, confirmed }),
   revealFile: (id: string) => invoke<void>('reveal_file', { id }),
+  openDonate: () => invoke<void>('open_donate'),
   sourceUrl: (id: string) => invoke<string>('source_url', { id }),
 
   mediaList: () => invoke<MediaView[]>('media_list'),

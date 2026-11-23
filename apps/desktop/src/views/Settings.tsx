@@ -2,6 +2,7 @@ import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { Check, FolderOpen, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { reportError } from '../lib/actions';
+import { PageTitle } from '../components/ui/page';
 import { useT } from '../lib/i18n';
 import { api } from '../lib/ipc';
 import { useApp } from '../lib/store';
@@ -88,9 +89,8 @@ export function Settings() {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="mx-auto max-w-[840px] px-6 pt-5 pb-12">
-        <div className="sticky top-0 z-10 -mx-6 flex items-center gap-3 bg-bg/95 px-6 py-2">
-          <h1 className="text-[15px] font-semibold tracking-[-0.01em]">{t('settings.title')}</h1>
-          <div className="ml-auto flex items-center gap-2">
+        <div className="sticky top-0 z-10 -mx-6 bg-bg/95 px-6 py-2">
+          <PageTitle eyebrow="Shift Downloader" title={t('settings.title')}>
             {state === 'saved' && !dirty && (
               <span className="flex items-center gap-1 text-[12px] text-ok">
                 <Check size={13} /> {t('action.saved')}
@@ -99,7 +99,7 @@ export function Settings() {
             <Button variant="primary" disabled={!dirty || state === 'saving'} onClick={() => save()}>
               {t('action.save')}
             </Button>
-          </div>
+          </PageTitle>
         </div>
 
         <Section title={t('settings.downloads')}>

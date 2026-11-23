@@ -14,7 +14,7 @@ pub fn run(action: &str) -> std::io::Result<()> {
             ),
             "hibernate" => ("shutdown.exe", &["/h"]),
             // 30 s de folga: `shutdown /a` ainda cancela.
-            "shutdown" => ("shutdown.exe", &["/s", "/t", "30", "/c", "SHIFT: todos os downloads terminaram."]),
+            "shutdown" => ("shutdown.exe", &["/s", "/t", "30", "/c", "Shift Downloader: todos os downloads terminaram."]),
             _ => return Err(std::io::Error::other("ação desconhecida")),
         };
         std::process::Command::new(program).args(args).creation_flags(CREATE_NO_WINDOW).spawn()?;

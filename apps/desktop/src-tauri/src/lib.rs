@@ -75,7 +75,7 @@ pub fn run() {
                 aria2_binary: aria2_path(),
                 session_file: data.join("aria2.session"),
                 default_download_dir: downloads,
-                user_agent: format!("SHIFT/{}", env!("CARGO_PKG_VERSION")),
+                user_agent: format!("ShiftDownloader/{}", env!("CARGO_PKG_VERSION")),
                 tools_dir: tools_dir(app.path().resource_dir().ok()),
             };
             let sink = Arc::new(sink::TauriSink::new(app.handle().clone()));
@@ -97,6 +97,10 @@ pub fn run() {
                 // Aparece em "Abrir com" e em Aplicativos padrão (sem trocar o padrão de ninguém).
                 if let Err(e) = defaults::register_capabilities(&exe) {
                     tracing::warn!(error = %e, "não consegui registrar magnet/.torrent");
+                }
+                // Instalações até a 0.4.1 ficavam em outra pasta: corrige caminhos que ainda apontem para lá.
+                if let Err(e) = defaults::refresh_paths(&exe) {
+                    tracing::warn!(error = %e, "não consegui atualizar caminhos antigos");
                 }
             }
             let args: Vec<String> = std::env::args().collect();
@@ -157,6 +161,7 @@ pub fn run() {
             commands::update_settings,
             commands::open_file,
             commands::reveal_file,
+            commands::open_donate,
             commands::source_url,
             commands::media_list,
             commands::media_analyze,

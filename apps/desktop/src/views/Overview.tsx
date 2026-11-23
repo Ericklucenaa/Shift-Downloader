@@ -5,6 +5,7 @@ import { api } from '../lib/ipc';
 import type { Insights } from '../lib/types';
 import { bytes } from '../lib/format';
 import { fileKind, percent, percentLabel, speed } from '../lib/format';
+import { PageTitle } from '../components/ui/page';
 import { useT } from '../lib/i18n';
 import { useApp } from '../lib/store';
 import { FileGlyph } from '../components/brand';
@@ -45,7 +46,7 @@ export function Overview() {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="mx-auto max-w-[1040px] px-6 pt-5 pb-8">
-        <h1 className="text-[15px] font-semibold tracking-[-0.01em]">{t('overview.title')}</h1>
+        <PageTitle eyebrow="Shift Downloader" title={t('overview.title')} />
         {stats.scheduleBlocked && (
           <button type="button" onClick={() => navigate('schedule')} className="mt-3 flex w-full items-center gap-2 rounded-md border border-warn/30 bg-warn-soft px-3 py-2 text-left text-[12.5px] text-warn">
             <CalendarClock size={14} /> {t('overview.scheduleBlocked')}

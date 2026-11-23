@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { reportError } from '../lib/actions';
+import { PageTitle } from '../components/ui/page';
 import { useT } from '../lib/i18n';
 import { api } from '../lib/ipc';
 import { useApp } from '../lib/store';
@@ -44,9 +45,8 @@ export function Schedule() {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="mx-auto max-w-[840px] px-6 pt-5 pb-12">
-        <div className="flex items-center gap-3 py-2">
-          <h1 className="text-[15px] font-semibold tracking-[-0.01em]">{t('nav.schedule')}</h1>
-          <div className="ml-auto flex items-center gap-2">
+        <div className="py-2">
+          <PageTitle eyebrow={t('nav.groupTools')} title={t('nav.schedule')}>
             {saved && !dirty && (
               <span className="flex items-center gap-1 text-[12px] text-ok">
                 <Check size={13} /> {t('action.saved')}
@@ -55,7 +55,7 @@ export function Schedule() {
             <Button variant="primary" disabled={!dirty || !valid} onClick={save}>
               {t('action.save')}
             </Button>
-          </div>
+          </PageTitle>
         </div>
 
         {settings.schedule.enabled && (

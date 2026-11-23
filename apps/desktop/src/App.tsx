@@ -77,8 +77,22 @@ function useCoreConnection(bar: React.RefObject<LinkBarHandle | null>) {
         useApp.getState().loadSnapshot(snap, media);
         applyTheme(snap.settings.theme);
         applyButtons(snap.settings.buttonStyle);
+        // 0.5.0: o visual passou a ser o da família Shift (botões planos). Migra uma vez quem estava no
+        // "liquid", padrão da 0.4.x; depois disso, a escolha em Configurações é respeitada.
+        let migrated: string | null = null;
+        try { migrated = localStorage.getItem('shift.design'); } catch { /* sem armazenamento */ }
+        if (migrated !== 'family-1') {
+          try { localStorage.setItem('shift.design', 'family-1'); } catch { /* idem */ }
+          if (snap.settings.buttonStyle === 'liquid') {
+            const s = await api.updateSettings({ ...snap.settings, buttonStyle: 'classic' }).catch(() => null);
+            if (s && alive) {
+              useApp.getState().setSettings?.(s);
+              applyButtons(s.buttonStyle);
+            }
+          }
+        }
         document.documentElement.lang = snap.settings.language;
-        // O Windows abriu o SHIFT com um magnet ou um .torrent.
+        // O Windows abriu o Shift Downloader com um magnet ou um .torrent.
         const launch = await api.takeLaunchTarget().catch(() => null);
         if (launch) setTimeout(() => void handleExternal(launch, bar), 300);
       } catch (e) {

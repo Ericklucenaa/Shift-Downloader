@@ -4,6 +4,7 @@ import { ArrowRight, Film, FolderOpen, FolderSearch, Music, Pause, Play, RotateC
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { mediaActions, reportError } from '../lib/actions';
 import { bytes, duration, percentLabel, speed } from '../lib/format';
+import { PageTitle } from '../components/ui/page';
 import { diagnosticText, useT } from '../lib/i18n';
 import { api, asDiagnostic } from '../lib/ipc';
 import { useApp } from '../lib/store';
@@ -409,10 +410,7 @@ export function Media() {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="mx-auto max-w-[980px] px-6 pt-5 pb-10">
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-[15px] font-semibold tracking-[-0.01em]">{t('nav.media')}</h1>
-          <p className="text-[12px] text-muted">{t('media.legal')}</p>
-        </div>
+        <PageTitle eyebrow={t('nav.groupTools')} title={t('nav.media')} caption={t('media.legal')} />
         {!available && <p className="mt-3 rounded-md bg-bad-soft px-3 py-2 text-[12.5px] text-bad">{t('media.unavailable')}</p>}
         <div className="mt-4 grid gap-4">
           <Analyzer />

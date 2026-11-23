@@ -157,8 +157,9 @@ fn one() -> f64 {
 fn two() -> u32 {
     2
 }
-fn liquid() -> String {
-    "liquid".into()
+/// Botões planos, como no Shift Control (o visual "liquid" continua como opção).
+fn classic() -> String {
+    "classic".into()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -195,7 +196,7 @@ pub struct Settings {
     #[serde(default = "two")]
     pub max_media_jobs: u32,
     /// classic | liquid (aparência dos botões principais)
-    #[serde(default = "liquid")]
+    #[serde(default = "classic")]
     pub button_style: String,
     /// A janela de boas-vindas da primeira abertura já foi respondida.
     #[serde(default)]
@@ -225,7 +226,7 @@ impl Settings {
             after_all: nothing(),
             browser_confirm: true,
             max_media_jobs: 2,
-            button_style: liquid(),
+            button_style: classic(),
             onboarded: false,
             close_to_tray: true,
             extra_trackers: true,

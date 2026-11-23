@@ -30,7 +30,7 @@ pub fn register(data_dir: &Path) -> Result<Vec<String>, String> {
     let manifest = data_dir.join("native-host.json");
     let body = json!({
         "name": HOST_NAME,
-        "description": "SHIFT Download Manager",
+        "description": "Shift Downloader",
         "path": exe.to_string_lossy(),
         "type": "stdio",
         "allowed_origins": [format!("chrome-extension://{EXTENSION_ID}/")]

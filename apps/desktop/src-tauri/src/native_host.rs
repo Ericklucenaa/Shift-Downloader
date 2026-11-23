@@ -1,4 +1,4 @@
-//! Modo "native messaging host": o navegador inicia o SHIFT com a origem da extensão
+//! Modo "native messaging host": o navegador inicia o Shift Downloader com a origem da extensão
 //! e troca mensagens JSON por stdin/stdout (4 bytes de tamanho + JSON).
 //! Este modo não abre janela; ele repassa pedidos para o app (ponte local com token)
 //! e, se o app estiver fechado, abre o app primeiro.
@@ -67,7 +67,7 @@ fn running() -> Option<BridgeInfo> {
     call(&info, "GET", "/v1/ping", None).map(|_| info)
 }
 
-/// Abre o SHIFT (processo separado, sem herdar stdin/stdout do navegador) e espera a ponte.
+/// Abre o Shift Downloader (processo separado, sem herdar stdin/stdout do navegador) e espera a ponte.
 fn launch_app() -> Option<BridgeInfo> {
     let exe = std::env::current_exe().ok()?;
     let mut cmd = std::process::Command::new(exe);
@@ -115,10 +115,10 @@ pub fn run() -> i32 {
                             });
                             match call(&i, "POST", "/v1/add", Some(&body)) {
                                 Some(_) => json!({ "ok": true }),
-                                None => json!({ "ok": false, "error": "o SHIFT recusou o pedido" }),
+                                None => json!({ "ok": false, "error": "o Shift Downloader recusou o pedido" }),
                             }
                         }
-                        None => json!({ "ok": false, "error": "não consegui abrir o SHIFT" }),
+                        None => json!({ "ok": false, "error": "não consegui abrir o Shift Downloader" }),
                     }
                 }
             }

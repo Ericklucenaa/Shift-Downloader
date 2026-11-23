@@ -43,8 +43,11 @@ jobs:
       - name: Testes Rust
         run: cargo test --workspace
 
+      # A chave de assinatura das atualizações fica só na máquina de quem publica (docs/RELEASING.md):
+      # aqui o instalador sai sem os artefatos do atualizador.
       - name: Instalador (NSIS)
-        run: npm run build
+        shell: bash
+        run: npm run build -- --config '{"bundle":{"createUpdaterArtifacts":false}}'
 
       - uses: actions/upload-artifact@v4
         with:

@@ -1,3 +1,5 @@
+<p align="center"><img src="apps/desktop/src-tauri/icons/128x128@2x.png" width="128" height="128" alt="Ícone do Shift Downloader"></p>
+
 # Shift Downloader
 
 [![Apoie no Ko-fi](https://img.shields.io/badge/Ko--fi-apoiar%20o%20projeto-2BB3A3?logo=ko-fi&logoColor=white)](https://ko-fi.com/ericklucena)

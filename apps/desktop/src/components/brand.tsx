@@ -1,18 +1,12 @@
-// Marca do Shift Downloader: o "H" de câmbio do SHIFT original, agora com a seta de download e o
-// acento turquesa da família Shift (o mesmo do Shift Control).
+// Marca do Shift Downloader: o ícone oficial do app (o "S" com a seta de download), o mesmo do
+// executável, do instalador e da extensão. Fonte: assets/icon-source.png.
 import clsx from 'clsx';
 import type { FileKind } from '../lib/format';
 import { Archive, AppWindow, Disc3, FileText, Film, Image, Music, File } from 'lucide-react';
+import logo from '../assets/logo.png';
 
-export function Mark({ size = 26, className }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <rect x="0.5" y="0.5" width="23" height="23" rx="6" fill="var(--accent)" />
-      <path d="M7.5 6v8.5M12 6v8.5M7.5 10.25H12" stroke="var(--accent-ink)" strokeWidth="1.9" strokeLinecap="round" fill="none" />
-      <path d="M16.5 6v8.5M14.2 12.3l2.3 2.4 2.3-2.4" stroke="var(--accent-ink)" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      <path d="M6.5 18h11" stroke="var(--accent-ink)" strokeWidth="1.9" strokeLinecap="round" />
-    </svg>
-  );
+export function Mark({ size = 28, className }: { size?: number; className?: string }) {
+  return <img src={logo} width={size} height={size} alt="" aria-hidden="true" draggable={false} className={clsx('shrink-0 select-none', className)} />;
 }
 
 export function Wordmark() {

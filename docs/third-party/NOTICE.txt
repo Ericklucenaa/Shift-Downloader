@@ -22,7 +22,7 @@ FFmpeg 9.0.2 (build BtbN "win64-gpl-shared", autobuild 2026-11-13)
   e https://github.com/BtbN/FFmpeg-Builds (receitas de compilação).
   Executado como programa separado (ffmpeg.exe / ffprobe.exe).
 
-yt-dlp 2026.10.26
+yt-dlp 2026.11.23
   https://github.com/yt-dlp/yt-dlp
   Licença: Unlicense (domínio público). Executado como programa separado.
   O SHIFT não contorna DRM, paywall nem login de terceiros.

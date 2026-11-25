@@ -15,7 +15,7 @@ export type DiagnosticKind =
   | 'dns' | 'connection' | 'timeout' | 'tls' | 'http_auth' | 'forbidden' | 'not_found' | 'expired'
   | 'server_error' | 'server_busy' | 'too_slow' | 'disk_full' | 'permission' | 'file_exists' | 'io'
   | 'resume_unsupported' | 'remote_changed' | 'redirect_blocked' | 'too_many_redirects' | 'checksum'
-  | 'invalid_url' | 'engine' | 'unsupported_url' | 'drm' | 'format_unavailable' | 'media_failed'
+  | 'invalid_url' | 'engine' | 'unsupported_url' | 'drm' | 'format_unavailable' | 'no_video' | 'media_failed'
   | 'tool_missing' | 'unknown';
 
 export interface Diagnostic {

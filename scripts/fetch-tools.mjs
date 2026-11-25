@@ -13,9 +13,9 @@ const cache = join(root, 'target/tools-cache');
 
 const TOOLS = [
   {
-    name: 'yt-dlp 2026.10.26',
-    url: 'https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.26/yt-dlp.exe',
-    sha256: 'f5389d3698ecde4ef06f4e6b1ce0294fe9ac1396228c8990b8d3416d6d177a7d',
+    name: 'yt-dlp 2026.11.23',
+    url: 'https://github.com/yt-dlp/yt-dlp/releases/download/2026.11.23/yt-dlp.exe',
+    sha256: '622ed48023cac1daa52a3bf3a6ac38f03514de214b5f0fa069389fd0f6d17e5c',
     install: (file) => cpSync(file, join(tools, 'yt-dlp.exe'))
   },
   {

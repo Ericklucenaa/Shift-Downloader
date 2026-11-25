@@ -271,7 +271,11 @@ impl MediaManager {
             return Err(tool_err(e.kind, &e.detail));
         }
         let v: Value = serde_json::from_str(out.trim()).map_err(|e| tool_err("media_failed", &format!("resposta do yt-dlp: {e}")))?;
-        Ok(ytdlp::parse_info(&v))
+        let info = ytdlp::parse_info(&v);
+        if info.is_playlist && info.entries == 0 && v.get("entries").and_then(Value::as_array).is_some_and(|a| !a.is_empty()) {
+            return Err(tool_err("no_video", "o post só tem fotos"));
+        }
+        Ok(info)
     }
 
     pub fn add_download(&self, req: MediaDownloadRequest) -> CoreResult<MediaView> {
@@ -806,8 +810,10 @@ async fn run_download(inner: &Arc<MInner>, job: &MediaJob) -> Result<Option<Stri
         None => {}
     })
     .await?;
-    if !ok {
-        let e = ytdlp::classify_error(&err.join("\n"));
+    let err = err.join("\n");
+    // Carrossel com fotos: o yt-dlp sai com erro pelas fotos puladas, mas os vídeos foram baixados.
+    if !ok && !(ytdlp::only_photo_errors(&err) && !files.is_empty()) {
+        let e = ytdlp::classify_error(&err);
         return Err(tool_err(e.kind, &e.detail));
     }
     let output = if playlist {

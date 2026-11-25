@@ -59,7 +59,7 @@ Tudo fica em `%APPDATA%\app.shift.downloads\` (banco, sessão do aria2, cópias 
 | Componente | Versão | Origem | SHA-256 |
 |---|---|---|---|
 | aria2c.exe | 1.37.0 | github.com/aria2/aria2 (release oficial) | `be2099c214f63a3cb4954b09a0becd6e2e34660b886d4c898d260febfe9d70c2` |
-| yt-dlp.exe | 2026.10.26 | github.com/yt-dlp/yt-dlp | `f5389d3698ecde4ef06f4e6b1ce0294fe9ac1396228c8990b8d3416d6d177a7d` |
+| yt-dlp.exe | 2026.11.23 | github.com/yt-dlp/yt-dlp | `622ed48023cac1daa52a3bf3a6ac38f03514de214b5f0fa069389fd0f6d17e5c` |
 | FFmpeg (zip) | 9.0.2 gpl-shared | github.com/BtbN/FFmpeg-Builds | `f4e068477787394da18a44b27d3e2cb19e05b21495b836a4fd5a31958b608932` |
 
 Licenças em `docs/third-party/NOTICE.txt`.

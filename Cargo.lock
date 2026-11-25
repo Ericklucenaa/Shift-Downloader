@@ -3822,7 +3822,7 @@ dependencies = [
 
 [[package]]
 name = "shift-core"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "base64 0.23.1",
  "chrono",
@@ -3848,7 +3848,7 @@ dependencies = [
 
 [[package]]
 name = "shift-desktop"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "serde",
  "serde_json",
@@ -3872,7 +3872,7 @@ dependencies = [
 
 [[package]]
 name = "shift-download-engine"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "reqwest",
  "serde",
@@ -3886,7 +3886,7 @@ dependencies = [
 
 [[package]]
 name = "shift-media"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "serde",
  "serde_json",
@@ -3894,7 +3894,7 @@ dependencies = [
 
 [[package]]
 name = "shift-persistence"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "rusqlite",
  "serde",
@@ -3905,7 +3905,7 @@ dependencies = [
 
 [[package]]
 name = "shift-security"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "percent-encoding",
  "thiserror 2.0.21",

@@ -33,6 +33,7 @@ pub enum DiagnosticKind {
     UnsupportedUrl,
     Drm,
     FormatUnavailable,
+    NoVideo,
     MediaFailed,
     ToolMissing,
     Unknown,
@@ -66,6 +67,7 @@ impl DiagnosticKind {
             Self::UnsupportedUrl => "unsupported_url",
             Self::Drm => "drm",
             Self::FormatUnavailable => "format_unavailable",
+            Self::NoVideo => "no_video",
             Self::MediaFailed => "media_failed",
             Self::ToolMissing => "tool_missing",
             Self::Unknown => "unknown",
@@ -82,8 +84,8 @@ impl DiagnosticKind {
     }
 }
 
-const ALL_KINDS: [DiagnosticKind; 28] = [
-    DiagnosticKind::UnsupportedUrl, DiagnosticKind::Drm, DiagnosticKind::FormatUnavailable,
+const ALL_KINDS: [DiagnosticKind; 29] = [
+    DiagnosticKind::UnsupportedUrl, DiagnosticKind::Drm, DiagnosticKind::FormatUnavailable, DiagnosticKind::NoVideo,
     DiagnosticKind::MediaFailed, DiagnosticKind::ToolMissing,
     DiagnosticKind::Dns, DiagnosticKind::Connection, DiagnosticKind::Timeout, DiagnosticKind::Tls,
     DiagnosticKind::HttpAuth, DiagnosticKind::Forbidden, DiagnosticKind::NotFound, DiagnosticKind::Expired,
@@ -144,6 +146,7 @@ fn texts(kind: DiagnosticKind) -> (&'static str, &'static str) {
         UnsupportedUrl => ("Este site não tem suporte para vídeo/áudio", "Se for um link direto de arquivo, cole na barra de downloads em vez da área de mídia."),
         Drm => ("Conteúdo protegido por DRM", "O SHIFT não contorna proteção de conteúdo. Use o aplicativo ou site oficial."),
         FormatUnavailable => ("O formato escolhido não está disponível", "Analise o link de novo e escolha outra qualidade."),
+        NoVideo => ("Este link não tem vídeo", "O post só tem fotos. O SHIFT baixa vídeo e áudio; salve as fotos pelo navegador."),
         MediaFailed => ("O processamento da mídia falhou", "O arquivo original não foi alterado. Veja o detalhe técnico e tente outro formato."),
         ToolMissing => ("Ferramenta de mídia não encontrada", "Reinstale o SHIFT: o yt-dlp ou o FFmpeg não está na pasta do programa."),
         Unknown => ("O download falhou", "Tente de novo. Os detalhes técnicos abaixo ajudam a entender o problema."),

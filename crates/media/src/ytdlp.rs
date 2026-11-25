@@ -63,9 +63,32 @@ fn codec(v: &Value, k: &str) -> Option<String> {
     s(v, k).filter(|c| c != "none")
 }
 
+/// Item já resolvido (não "plano") que veio sem nenhum formato: foto de um carrossel.
+fn is_photo_entry(e: &Value) -> bool {
+    e.get("formats").and_then(Value::as_array).is_some_and(|f| f.is_empty())
+}
+
+/// Um post com fotos e vídeos (carrossel do Instagram, por exemplo) chega como playlist cujos itens
+/// já vêm resolvidos. As fotos não contam como itens; se sobrar um vídeo só, ele é mostrado como
+/// vídeo comum, com as qualidades de verdade.
 pub fn parse_info(v: &Value) -> MediaInfo {
     let is_playlist = s(v, "_type").as_deref() == Some("playlist");
-    let entries = v.get("entries").and_then(Value::as_array).map_or(0, |a| a.len() as u32);
+    let videos: Vec<&Value> = v
+        .get("entries")
+        .and_then(Value::as_array)
+        .map(|a| a.iter().filter(|e| !e.is_null() && !is_photo_entry(e)).collect())
+        .unwrap_or_default();
+    if is_playlist
+        && let [only] = videos.as_slice()
+        && only.get("formats").is_some()
+    {
+        let mut info = parse_info(only);
+        if let Some(u) = s(v, "webpage_url") {
+            info.webpage_url = u;
+        }
+        return info;
+    }
+    let entries = videos.len() as u32;
     let formats: Vec<MediaFormat> = v
         .get("formats")
         .and_then(Value::as_array)
@@ -222,6 +245,8 @@ pub fn download_args(a: &DownloadArgs<'_>) -> Vec<String> {
         "--windows-filenames",
         "--no-mtime",
         "--embed-metadata",
+        // Fotos de um carrossel não têm formato de vídeo: são puladas em vez de derrubar o post inteiro.
+        "--ignore-no-formats-error",
         "--progress",
         "--progress-template",
         "download:SHIFTPROG %(progress.status)s|%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s|%(progress.speed)s|%(progress.eta)s|%(info.playlist_index)s|%(info.n_entries)s|%(info.format_id)s",
@@ -239,7 +264,7 @@ pub fn download_args(a: &DownloadArgs<'_>) -> Vec<String> {
 
 /// Argumentos da análise (JSON único; playlists sem baixar cada item).
 pub fn analyze_args(url: &str) -> Vec<String> {
-    ["--encoding", "utf-8", "-J", "--flat-playlist", "--no-warnings", "--no-colors", "--", url].into_iter().map(str::to_string).collect()
+    ["--encoding", "utf-8", "-J", "--flat-playlist", "--ignore-no-formats-error", "--no-warnings", "--no-colors", "--", url].into_iter().map(str::to_string).collect()
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -287,12 +312,21 @@ pub fn parse_line(line: &str) -> Option<Event> {
     line.strip_prefix(FILE_PREFIX).map(|p| Event::File(p.trim().to_string()))
 }
 
+/// Todas as linhas de erro são de itens sem vídeo (fotos de um carrossel)? Nesse caso o yt-dlp sai
+/// com código 1 mesmo tendo baixado os vídeos do post.
+pub fn only_photo_errors(stderr: &str) -> bool {
+    let mut errors = stderr.lines().filter(|l| l.contains("ERROR")).peekable();
+    errors.peek().is_some() && errors.all(|l| l.to_ascii_lowercase().contains("no video formats found"))
+}
+
 /// Classifica a mensagem de erro do yt-dlp (linhas "ERROR: …").
 pub fn classify_error(stderr: &str) -> ToolError {
     let err = stderr.lines().rfind(|l| l.contains("ERROR")).unwrap_or(stderr).trim().to_string();
     let l = err.to_ascii_lowercase();
     let kind = if l.contains("unsupported url") || l.contains("no video formats found") && l.contains("generic") {
         "unsupported_url"
+    } else if l.contains("no video formats found") {
+        "no_video"
     } else if l.contains("drm") {
         "drm"
     } else if l.contains("requested format is not available") || l.contains("format is not available") {
@@ -358,6 +392,36 @@ mod tests {
         assert!(i.is_playlist);
         assert_eq!(i.entries, 2);
         assert!(i.choices.iter().any(|c| c.id == "best") && i.choices.iter().any(|c| c.id == "audio-mp3"));
+    }
+
+    fn carrossel(itens: Vec<Value>) -> Value {
+        json!({"_type": "playlist", "id": "DgK", "title": "Post by cazetv", "webpage_url": "https://www.instagram.com/p/DgK/", "entries": itens})
+    }
+
+    #[test]
+    fn carrossel_com_foto_e_um_video_vira_video_comum() {
+        let foto = json!({"id": "foto1", "title": "Foto", "formats": []});
+        let video = json!({"id": "vid1", "title": "Video by cazetv", "webpage_url": "https://www.instagram.com/p/vid1/",
+            "formats": [{"format_id": "1", "ext": "mp4", "vcodec": "avc1", "acodec": "none", "height": 1280},
+                        {"format_id": "2", "ext": "m4a", "vcodec": "none", "acodec": "mp4a"}]});
+        let i = parse_info(&carrossel(vec![foto.clone(), video.clone()]));
+        assert!(!i.is_playlist, "um vídeo só não é playlist");
+        assert_eq!(i.title, "Video by cazetv");
+        assert_eq!(i.webpage_url, "https://www.instagram.com/p/DgK/", "baixa pelo link do post");
+        assert_eq!(i.choices[0].label, "Melhor qualidade (1280p)");
+        let i = parse_info(&carrossel(vec![foto.clone(), video.clone(), video]));
+        assert!(i.is_playlist && i.entries == 2, "fotos não contam como itens");
+        assert_eq!(parse_info(&carrossel(vec![foto])).entries, 0);
+    }
+
+    #[test]
+    fn erro_so_de_fotos_puladas() {
+        let fotos = "WARNING: No video formats found!\nERROR: [Instagram] DgK_9bVjgau: No video formats found!; please report this issue";
+        assert!(only_photo_errors(fotos));
+        assert!(!only_photo_errors(&format!("{fotos}\nERROR: unable to download video data: HTTP Error 403: Forbidden")));
+        assert!(!only_photo_errors("WARNING: nada"));
+        assert_eq!(classify_error(fotos).kind, "no_video");
+        assert!(analyze_args("u").contains(&"--ignore-no-formats-error".to_string()));
     }
 
     #[test]
